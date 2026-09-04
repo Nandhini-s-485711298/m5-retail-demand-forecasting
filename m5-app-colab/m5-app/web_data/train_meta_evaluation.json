@@ -1,0 +1,8 @@
+{
+  "mode": "evaluation",
+  "best_iteration": 551,
+  "valid_rmse": 2.139104148833615,
+  "n_series": 30490,
+  "first_date": "2016-05-23",
+  "last_date": "2016-06-19"
+}

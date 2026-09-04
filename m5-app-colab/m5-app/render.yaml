@@ -1,0 +1,10 @@
+# Render.com blueprint - https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: m5-demand-forecasting
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true

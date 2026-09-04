@@ -1,0 +1,17 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: m5-dashboard
+
+    container_name: m5-dashboard
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      PORT: 8000
+
+    restart: unless-stopped

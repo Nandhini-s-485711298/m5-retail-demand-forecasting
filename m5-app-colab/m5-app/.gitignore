@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+data/raw/*.csv
+data/processed/
+outputs/*.txt
+*.zip
+users.db
+# Training outputs - not required by deployed dashboard
+outputs/
+outputs_backup/

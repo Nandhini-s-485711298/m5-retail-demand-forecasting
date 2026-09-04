@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Walmart M5 Retail Demand Forecasting Dashboard"
+    >
+
+    <title>M5 Retail Demand Forecasting</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ========================================================
+         SIDEBAR
+    ========================================================= -->
+
+    <aside class="sidebar">
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                📦
+            </div>
+
+            <div>
+
+                <div class="brand-title">
+                    M5 Demand
+                </div>
+
+                <div class="brand-subtitle">
+                    Intelligence
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             FORECAST MODE
+        ===================================================== -->
+
+        <div class="side-section">
+
+            <div class="side-title">
+                FORECAST WINDOW
+            </div>
+
+            <label class="label">
+                Forecast Mode
+            </label>
+
+            <select id="mode">
+
+                <option value="evaluation">
+                    Final Forecast
+                </option>
+
+                <option value="validation">
+                    Validation
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ====================================================
+             FILTERS
+        ===================================================== -->
+
+        <div class="side-section">
+
+            <div class="side-title">
+                FILTERS
+            </div>
+
+
+            <label class="label">
+                State
+            </label>
+
+            <select id="state">
+
+                <option value="">
+                    All States
+                </option>
+
+            </select>
+
+
+            <label class="label">
+                Store
+            </label>
+
+            <select id="store">
+
+                <option value="">
+                    All Stores
+                </option>
+
+            </select>
+
+
+            <label class="label">
+                Category
+            </label>
+
+            <select id="category">
+
+                <option value="">
+                    All Categories
+                </option>
+
+            </select>
+
+
+            <label class="label">
+                Department
+            </label>
+
+            <select id="department">
+
+                <option value="">
+                    All Departments
+                </option>
+
+            </select>
+
+
+            <label class="label">
+                Item
+            </label>
+
+            <select id="item">
+
+                <option value="">
+                    All Items
+                </option>
+
+            </select>
+
+
+            <button
+                class="reset-button"
+                onclick="resetFilters()"
+            >
+                Reset Filters
+            </button>
+
+        </div>
+
+
+        <!-- ====================================================
+             NAVIGATION
+        ===================================================== -->
+
+        <div class="side-section">
+
+            <div class="side-title">
+                DASHBOARD
+            </div>
+
+
+            <!-- OVERVIEW -->
+
+            <button
+                class="nav-button active"
+                onclick="showPage('overview', this)"
+            >
+                📊 Overview
+            </button>
+
+
+            <!-- HIERARCHY -->
+
+            <button
+                class="nav-button"
+                onclick="showPage('hierarchy', this)"
+            >
+                🏢 Hierarchy
+            </button>
+
+
+            <!-- DEMAND DRIVERS -->
+
+            <button
+                class="nav-button"
+                onclick="showPage('drivers', this)"
+            >
+                🎯 Demand Drivers
+            </button>
+
+
+            <!-- PLANNING -->
+
+            <button
+                class="nav-button"
+                onclick="showPage('planning', this)"
+            >
+                🛒 Planning
+            </button>
+
+
+            <!-- EXPORT -->
+
+            <button
+                class="nav-button"
+                onclick="showPage('export', this)"
+            >
+                ⬇️ Export
+            </button>
+
+        </div>
+
+
+        <!-- ====================================================
+             CONNECTION STATUS
+        ===================================================== -->
+
+        <div class="sidebar-footer">
+
+            <span
+                id="connection-dot"
+                class="connection-dot"
+            ></span>
+
+            <div>
+
+                <strong id="connection-text">
+                    Checking API...
+                </strong>
+
+                <small>
+                    FastAPI
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ========================================================
+         MAIN
+    ========================================================= -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <div class="eyebrow">
+                    WALMART M5 FORECASTING
+                </div>
+
+                <h1>
+                    Retail Demand Forecasting
+                </h1>
+
+                <p>
+                    Hierarchical item-level demand
+                    intelligence powered by machine learning.
+                </p>
+
+            </div>
+
+
+            <div
+                id="api-status"
+                class="api-status"
+            >
+                ● Live API
+            </div>
+
+        </header>
+
+
+        <!-- ====================================================
+             ERROR
+        ===================================================== -->
+
+        <div
+            id="error-box"
+            class="error-box hidden"
+        ></div>
+
+
+        <!-- ====================================================
+             LOADING
+        ===================================================== -->
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            Loading forecasting data...
+        </div>
+
+
+        <!-- ====================================================
+             CONTENT
+        ===================================================== -->
+
+        <div id="content">
+
+
+            <!-- =================================================
+                 OVERVIEW
+            ================================================== -->
+
+            <section
+                id="page-overview"
+                class="page"
+            >
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Executive Overview
+                        </h2>
+
+                        <p id="forecast-window">
+                            Loading...
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        id="mode-badge"
+                        class="badge"
+                    >
+                        evaluation
+                    </span>
+
+                </div>
+
+
+                <!-- METRICS -->
+
+                <div class="metrics">
+
+
+                    <!-- FORECAST UNITS -->
+
+                    <div class="metric">
+
+                        <span>
+                            📈 Forecast Units
+                        </span>
+
+                        <strong id="total-units">
+                            0
+                        </strong>
+
+                        <small>
+                            Predicted demand
+                        </small>
+
+                    </div>
+
+
+                    <!-- SERIES -->
+
+                    <div class="metric">
+
+                        <span>
+                            📦 Series
+                        </span>
+
+                        <strong id="series-count">
+                            0
+                        </strong>
+
+                        <small>
+                            Item × Store
+                        </small>
+
+                    </div>
+
+
+                    <!-- AVERAGE -->
+
+                    <div class="metric">
+
+                        <span>
+                            📊 Average / Day
+                        </span>
+
+                        <strong id="average-units">
+                            0
+                        </strong>
+
+                        <small>
+                            Selected scope
+                        </small>
+
+                    </div>
+
+
+                    <!-- PEAK -->
+
+                    <div class="metric">
+
+                        <span>
+                            🔥 Peak Day
+                        </span>
+
+                        <strong id="peak-day">
+                            0
+                        </strong>
+
+                        <small id="peak-date">
+                            —
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DAILY FORECAST -->
+
+                <div class="card">
+
+                    <div class="card-title">
+
+                        <h3>
+                            Daily Demand Forecast
+                        </h3>
+
+                        <span>
+                            28-day forecast horizon
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="forecast-chart"
+                        class="chart"
+                    >
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORY + STORE -->
+
+                <div class="two-column">
+
+
+                    <!-- CATEGORY -->
+
+                    <div class="card">
+
+                        <div class="card-title">
+
+                            <h3>
+                                Demand by Category
+                            </h3>
+
+                        </div>
+
+
+                        <div
+                            id="category-chart"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- STORE -->
+
+                    <div class="card">
+
+                        <div class="card-title">
+
+                            <h3>
+                                Demand by Store
+                            </h3>
+
+                        </div>
+
+
+                        <div
+                            id="store-chart"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TOP ITEMS -->
+
+                <div class="card">
+
+                    <div class="card-title">
+
+                        <div>
+
+                            <h3>
+                                Top Item × Store Forecasts
+                            </h3>
+
+                            <span>
+                                Highest predicted demand
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="top-items"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 HIERARCHY
+            ================================================== -->
+
+            <section
+                id="page-hierarchy"
+                class="page hidden"
+            >
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Hierarchical Forecast
+                        </h2>
+
+                        <p>
+                            Bottom-up aggregation from
+                            Item × Store to total demand.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="hierarchy-content"
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 DEMAND DRIVERS
+            ================================================== -->
+
+            <section
+                id="page-drivers"
+                class="page hidden"
+            >
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Demand Drivers
+                        </h2>
+
+                        <p>
+                            Calendar events, SNAP effects
+                            and weekly demand patterns.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="events-content"
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PLANNING
+            ================================================== -->
+
+            <section
+                id="page-planning"
+                class="page hidden"
+            >
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Demand Planning
+                        </h2>
+
+                        <p>
+                            Convert forecast demand into
+                            practical planning quantities.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SAFETY BUFFER -->
+
+                <div class="card">
+
+                    <label class="label">
+
+                        Safety Buffer:
+
+                        <strong id="buffer-value">
+                            10%
+                        </strong>
+
+                    </label>
+
+
+                    <input
+                        id="buffer"
+                        type="range"
+                        min="0"
+                        max="30"
+                        step="5"
+                        value="10"
+                        oninput="updatePlanning()"
+                    >
+
+                </div>
+
+
+                <!-- PLANNING METRICS -->
+
+                <div class="metrics">
+
+
+                    <!-- FORECAST -->
+
+                    <div class="metric">
+
+                        <span>
+                            📈 Forecast Demand
+                        </span>
+
+                        <strong
+                            id="planning-forecast"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            28 days
+                        </small>
+
+                    </div>
+
+
+                    <!-- BUFFER -->
+
+                    <div class="metric">
+
+                        <span>
+                            🛡️ Safety Buffer
+                        </span>
+
+                        <strong
+                            id="planning-buffer"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            Additional units
+                        </small>
+
+                    </div>
+
+
+                    <!-- TOTAL -->
+
+                    <div class="metric">
+
+                        <span>
+                            🛒 Planning Quantity
+                        </span>
+
+                        <strong
+                            id="planning-total"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            Forecast + buffer
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 EXPORT
+            ================================================== -->
+
+            <section
+                id="page-export"
+                class="page hidden"
+            >
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Export Forecasts
+                        </h2>
+
+                        <p>
+                            Download the currently selected
+                            forecast data.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="export-grid">
+
+
+                    <!-- LONG FORMAT -->
+
+                    <div
+                        class="card export-card"
+                    >
+
+                        <div class="export-icon">
+                            📄
+                        </div>
+
+
+                        <h3>
+                            Long Format
+                        </h3>
+
+
+                        <p>
+                            One row per Item × Store × Date.
+                        </p>
+
+
+                        <button
+                            onclick="downloadExport('long')"
+                            class="primary-button"
+                        >
+                            Download CSV
+                        </button>
+
+                    </div>
+
+
+                    <!-- WIDE FORMAT -->
+
+                    <div
+                        class="card export-card"
+                    >
+
+                        <div class="export-icon">
+                            📊
+                        </div>
+
+
+                        <h3>
+                            Wide Format
+                        </h3>
+
+
+                        <p>
+                            One row per series with
+                            forecast horizons.
+                        </p>
+
+
+                        <button
+                            onclick="downloadExport('wide')"
+                            class="primary-button"
+                        >
+                            Download CSV
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script src="/app.js"></script>
+
+</body>
+</html>

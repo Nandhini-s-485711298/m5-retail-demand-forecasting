@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+data/
+outputs/
+src/
+.git/
+.gitignore
+*.zip
+users.db
+app.py
+app_deploy.py
+requirements.txt
+.streamlit/
+docker-compose.yml
+*.md

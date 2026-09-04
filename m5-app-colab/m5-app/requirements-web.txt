@@ -1,0 +1,8 @@
+# Runtime deps for the deployed dashboard only.
+# The training pipeline (lightgbm, scikit-learn) is NOT needed to serve
+# precomputed forecasts, which keeps the image small.
+streamlit>=1.30
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14.0
+plotly>=5.18
